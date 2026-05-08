@@ -1,7 +1,18 @@
 import openai
 import gradio
+import os
+from dotenv import load_dotenv
 
-openai.api_key = "YOUR_API_KEY"
+load_dotenv()
+
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise EnvironmentError(
+        "OPENAI_API_KEY is not set. "
+        "Copy .env.example to .env and populate it before running."
+    )
+
+openai.api_key = api_key
 
 messages = [{"role": "system", "content": "You are a healthcare expert"}]
 
@@ -37,24 +48,28 @@ def clear_messages():
     global messages
     messages = [{"role": "system", "content": "You are a AI doctor"}]
 
-interface = gradio.Interface(
-    fn=CustomChatGPT,
-    inputs="text",
-    outputs="text",
-    title="AI Healthcare Bot",  # Change the title
-    layout="vertical",
-    theme="huggingface",
-    examples=[
-        ["What are the symptoms of COVID-19?"],
-        ["How can I prevent heart disease?"],
-    ],
-    buttons=[
-        gradio.Button("Submit"),
-        gradio.Button("Clear", onclick=clear_messages),
-        gradio.Button("Flag"),
-        gradio.Button("Share"),
-    ],
-    footer="Powered by OpenAI",
-)
+with gradio.Blocks() as interface:
+    gradio.Markdown("# AI Healthcare Bot")
+    input_text = gradio.Textbox(label="Input", placeholder="Type your symptoms or questions here...")
+    output_text = gradio.Textbox(label="Output")
+    
+    gradio.Examples(
+        examples=[
+            "What are the symptoms of COVID-19?",
+            "How can I prevent heart disease?"
+        ],
+        inputs=input_text
+    )
+    
+    with gradio.Row():
+        submit_btn = gradio.Button("Submit", variant="primary")
+        clear_btn = gradio.Button("Clear History")
+    
+    def clear_and_reset():
+        clear_messages()
+        return ""
+        
+    submit_btn.click(fn=CustomChatGPT, inputs=input_text, outputs=output_text)
+    clear_btn.click(fn=clear_and_reset, inputs=None, outputs=output_text)
 
 interface.launch(share=True)

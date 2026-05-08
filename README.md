@@ -29,13 +29,13 @@ Medibot is an AI-powered healthcare assistant designed to provide medical inform
 2.  **Install the dependencies:**
     You will need Python installed. Install the necessary Python packages:
     ```bash
-    pip install openai gradio
+    pip install openai gradio python-dotenv
     ```
 
 3.  **Configure API Keys:**
-    Open `buildathon project/chatbot.py` and replace the placeholder `YOUR_API_KEY` with your actual OpenAI API key.
-    ```python
-    openai.api_key = "YOUR_API_KEY"
+    Create a `.env` file in the `buildathon project` directory (you can copy `.env.example` to `.env`) and add your OpenAI API key:
+    ```env
+    OPENAI_API_KEY=your_actual_api_key_here
     ```
 
 4.  **Run the application:**
